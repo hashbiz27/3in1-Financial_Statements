@@ -1,0 +1,607 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:transparent}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.wrap{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);flex-wrap:wrap;gap:8px}
+.hdr-title{font-size:14px;font-weight:500}
+.hdr-sub{font-size:10px;color:var(--color-text-tertiary);margin-top:1px}
+.hdr-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{font-size:11px;padding:4px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.btn.accent{background:#1a7fd4;color:#fff;border-color:#1a7fd4}
+.btn.accent:hover{background:#1568b3}
+.btn.danger:hover{background:var(--color-background-danger);color:var(--color-text-danger);border-color:var(--color-border-danger)}
+.btn.sc-bull{background:#1d9e75;color:#fff;border-color:#1d9e75}
+.btn.sc-base{background:#1a7fd4;color:#fff;border-color:#1a7fd4}
+.btn.sc-bear{background:#d85a30;color:#fff;border-color:#d85a30}
+.tabs{display:flex;border-bottom:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);overflow-x:auto}
+.tab{padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--color-text-secondary);white-space:nowrap;flex-shrink:0}
+.tab:hover{color:var(--color-text-primary)}
+.tab.on{color:#1a7fd4;border-bottom-color:#1a7fd4}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:7px;padding:10px 14px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.kpi{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 9px}
+.kpi-lbl{font-size:9px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.kpi-v{font-size:14px;font-weight:500;font-family:var(--font-mono)}
+.sheet{overflow-x:auto;max-height:420px;overflow-y:auto}
+table{border-collapse:collapse;font-size:12px;width:100%}
+thead{position:sticky;top:0;z-index:10}
+thead tr.yr-row th{background:var(--color-background-secondary);padding:0;border-bottom:0.5px solid var(--color-border-secondary)}
+.th-inner{display:flex;align-items:center;justify-content:flex-end;gap:3px;padding:5px 8px;position:relative}
+.yr-label{font-family:var(--font-mono);font-size:11px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);text-align:right;width:52px;padding:0}
+.yr-label:focus{outline:1px solid #1a7fd4;border-radius:2px;color:var(--color-text-primary);background:var(--color-background-info)}
+.yr-label.hist{color:var(--color-text-tertiary)}
+.yr-label.fore{color:#1a7fd4}
+.del-col{font-size:10px;cursor:pointer;color:var(--color-text-tertiary);padding:0 2px;line-height:1;border:none;background:none}
+.del-col:hover{color:var(--color-text-danger)}
+th.lc{text-align:left;min-width:170px;position:sticky;left:0;z-index:11;background:var(--color-background-secondary)}
+th.lc .th-inner{justify-content:flex-start;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--color-text-tertiary);font-weight:500}
+tbody tr{transition:background .08s}
+tbody tr:hover{background:var(--color-background-secondary)}
+tbody tr.sec td{background:var(--color-background-tertiary);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--color-text-secondary);padding:4px 10px;border-top:0.5px solid var(--color-border-secondary)}
+tbody tr.sec td.lc{position:sticky;left:0;background:var(--color-background-tertiary)}
+tbody tr.sub td{border-top:0.5px solid var(--color-border-secondary);font-weight:500}
+tbody tr.tot td{border-top:1px solid var(--color-border-secondary);font-weight:500;background:var(--color-background-secondary)}
+tbody tr.tot td.lc{position:sticky;left:0;background:var(--color-background-secondary)}
+tbody td{padding:3px 8px;text-align:right;border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;color:var(--color-text-primary)}
+td.lc{text-align:left;position:sticky;left:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);padding-left:18px;color:var(--color-text-secondary);font-size:12px}
+tbody tr:hover td.lc{background:var(--color-background-secondary)}
+tbody tr.sec td.lc{padding-left:10px}
+.num{font-family:var(--font-mono)}
+.num.neg{color:var(--color-text-danger)}
+.num.pos{color:var(--color-text-success)}
+.cell-inp{font-family:var(--font-mono);font-size:12px;border:none;background:transparent;color:#1a7fd4;text-align:right;width:100%;padding:0;cursor:text;min-width:55px}
+.cell-inp:focus{outline:1px solid #1a7fd4;border-radius:2px;background:var(--color-background-info)}
+.cell-inp.pct{color:#1a7fd4}
+.tip-wrap{position:relative;display:inline-flex;align-items:center;gap:4px}
+.tip-icon{font-size:10px;color:var(--color-text-tertiary);cursor:help;border:0.5px solid var(--color-border-tertiary);border-radius:50%;width:13px;height:13px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ttip{display:none;position:absolute;left:105%;top:50%;transform:translateY(-50%);z-index:999;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:7px 9px;font-size:11px;color:var(--color-text-secondary);line-height:1.5;min-width:170px;max-width:230px}
+.tip-wrap:hover .ttip{display:block}
+.add-col-bar{display:flex;gap:8px;padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);align-items:center;flex-wrap:wrap}
+.add-col-bar label{font-size:11px;color:var(--color-text-secondary)}
+.add-col-bar input[type=text]{font-size:12px;font-family:var(--font-mono);padding:4px 8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);width:80px}
+.add-col-bar select{font-size:11px;padding:4px 6px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary)}
+.foot{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);flex-wrap:wrap;gap:6px}
+.foot-note{font-size:10px;color:var(--color-text-tertiary)}
+.check-ok{font-size:11px;font-weight:500;color:var(--color-text-success)}
+.check-no{font-size:11px;font-weight:500;color:var(--color-text-danger)}
+.wf-row{display:flex;gap:5px;align-items:flex-end;height:80px;padding:12px 14px 4px;border-top:0.5px solid var(--color-border-tertiary)}
+.wf-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.wf-bar{width:100%;border-radius:2px 2px 0 0;min-height:3px}
+.wf-lbl{font-size:9px;color:var(--color-text-tertiary);font-family:var(--font-mono);text-align:center}
+.wf-v{font-size:9px;font-family:var(--font-mono);color:var(--color-text-secondary)}
+</style>
+
+<h2 class="sr-only">Editable 3-in-1 financial statement tool with addable and deletable year columns, scenario toggles, and live formula recalculation.</h2>
+
+<div class="wrap">
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Financial Statements</div>
+    <div class="hdr-sub">Figures in $M &middot; blue cells = editable inputs &middot; click any year label to rename it</div>
+  </div>
+  <div class="hdr-controls">
+    <span style="font-size:10px;color:var(--color-text-tertiary)">Scenario:</span>
+    <button class="btn" id="btnBull" onclick="setSc('bull')">Bull</button>
+    <button class="btn sc-base" id="btnBase" onclick="setSc('base')">Base</button>
+    <button class="btn" id="btnBear" onclick="setSc('bear')">Bear</button>
+    <button class="btn accent" onclick="exportCSV()">Export CSV</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab on" onclick="showTab('IS')">Income Statement</div>
+  <div class="tab" onclick="showTab('BS')">Balance Sheet</div>
+  <div class="tab" onclick="showTab('CF')">Cash Flow</div>
+  <div class="tab" onclick="showTab('RA')">Ratios</div>
+</div>
+
+<div class="kpis" id="kpiRow"></div>
+
+<div class="sheet" id="sheetWrap">
+  <table id="mainTbl"></table>
+</div>
+
+<div class="wf-row" id="wfRow"></div>
+
+<div class="add-col-bar">
+  <label>Add year:</label>
+  <input type="text" id="newYrLabel" value="FY25E" style="width:70px">
+  <select id="newYrType">
+    <option value="fore">Forecast</option>
+    <option value="hist">Historical</option>
+  </select>
+  <button class="btn accent" onclick="addColumn()">+ Add column</button>
+  <span style="font-size:10px;color:var(--color-text-tertiary);margin-left:4px">Click x on any column header to delete it</span>
+</div>
+
+<div class="foot">
+  <span class="foot-note">All grey cells auto-calculate &middot; rename any year by clicking its label</span>
+  <span id="bsCheck"></span>
+</div>
+</div>
+
+<script>
+const TIPS={
+  'Revenue':'Total money earned from goods/services. The model\'s top line.',
+  'COGS %':'Cost of Goods Sold as % of revenue. Edit the % to change gross profit.',
+  'Gross Profit':'Revenue minus COGS. Reflects product-level economics.',
+  'OPEX %':'Total operating expenses as % of revenue. Covers SG&A, R&D, G&A.',
+  'EBITDA':'Earnings before interest, tax, depreciation & amortisation.',
+  'D&A %':'Depreciation & amortisation as % of revenue. Non-cash charge.',
+  'EBIT':'Operating profit after D&A is deducted from EBITDA.',
+  'Interest %':'Net interest expense as % of revenue.',
+  'Pre-Tax Profit':'EBIT minus net interest expense.',
+  'Tax Rate':'Effective corporate tax rate applied to pre-tax profit.',
+  'NPAT':'Net Profit After Tax — the bottom line for shareholders.',
+  'Cash':'Cash & equivalents. Calculated as % of revenue.',
+  'Accounts Receivable':'Money owed by customers. Driven by receivable days × revenue.',
+  'Other Current Assets':'Prepayments, inventory, and other short-term assets (~3% rev).',
+  'Total Current Assets':'All assets convertible to cash within 12 months.',
+  'PP&E (net)':'Property, plant & equipment net of depreciation.',
+  'Intangibles & Goodwill':'Acquired intangibles and goodwill — typically stable post-acquisition.',
+  'Other Non-Current Assets':'Investments, deferred tax assets, other long-term items.',
+  'Total Non-Current Assets':'Assets held for more than 12 months.',
+  'Total Assets':'Full asset base. Must equal total liabilities + equity.',
+  'Accounts Payable':'Money owed to suppliers. Payable days × COGS.',
+  'Other Current Liabilities':'Accrued expenses, deferred revenue, current tax (~10% rev).',
+  'Total Current Liabilities':'Obligations due within the next 12 months.',
+  'Long-Term Debt':'Bonds and bank debt due beyond 12 months.',
+  'Other Non-Current Liabilities':'Provisions, deferred tax liabilities, other long-term items.',
+  'Total Non-Current Liabilities':'All liabilities due beyond 12 months.',
+  'Total Liabilities':'Sum of all creditor claims on the business.',
+  'Contributed Equity':'Capital invested by shareholders directly.',
+  'Retained Earnings':'Cumulative profits retained in the business after dividends.',
+  'Total Equity':'Net assets attributable to shareholders (Assets − Liabilities).',
+  'Total Liabilities + Equity':'Must equal Total Assets — the fundamental accounting identity.',
+  'Operating Cash Flow':'Cash from day-to-day operations: NPAT + D&A ± working capital.',
+  'Investing Cash Flow':'Capex, acquisitions, and asset disposals.',
+  'Financing Cash Flow':'Dividends paid and net debt movements.',
+  'Net Change in Cash':'Sum of the three cash flow sections.',
+  'Gross Margin':'Gross Profit ÷ Revenue. Platform businesses typically 80–95%.',
+  'EBITDA Margin':'EBITDA ÷ Revenue. Key operating profitability metric.',
+  'EBIT Margin':'EBIT ÷ Revenue. Operating profit after non-cash charges.',
+  'NPAT Margin':'Net Profit ÷ Revenue. Overall bottom-line profitability.',
+  'ROE':'NPAT ÷ Equity. Return generated on shareholders\' capital.',
+  'ROA':'NPAT ÷ Total Assets. Asset efficiency in generating profit.',
+  'Net Debt / EBITDA':'Leverage ratio. Below 2× is generally comfortable.',
+  'D/E Ratio':'Total Debt ÷ Equity. Higher = more financial risk.',
+  'Current Ratio':'Current Assets ÷ Current Liabilities. >1× means liquid.',
+  'Interest Coverage':'EBIT ÷ Interest Expense. >3× is typically safe.',
+};
+
+let sc='base';
+let tab='IS';
+
+let cols=[
+  {id:0,label:'FY15',type:'hist'},
+  {id:1,label:'FY16',type:'hist'},
+  {id:2,label:'FY17',type:'hist'},
+  {id:3,label:'FY18',type:'hist'},
+  {id:4,label:'FY19',type:'hist'},
+  {id:5,label:'FY20E',type:'fore'},
+  {id:6,label:'FY21E',type:'fore'},
+  {id:7,label:'FY22E',type:'fore'},
+  {id:8,label:'FY23E',type:'fore'},
+  {id:9,label:'FY24E',type:'fore'},
+];
+let nextId=10;
+
+const BASE={
+  rev:    [312,344,372,377,418,  452,499,558,626,702],
+  cogsP:  [9.86,8.78,9.15,7.92,8.07, 8.75,8.75,8.75,8.75,8.75],
+  opexP:  [40.63,41.70,43.43,40.02,42.77, 46.74,48.49,50.24,51.99,53.74],
+  daP:    [1.6,2.3,2.7,4.2,5.7, 4.87,4.61,4.12,3.68,3.42],
+  intP:   [2.9,2.6,2.15,2.92,3.59, 3.54,3.21,2.87,2.56,2.28],
+  taxP:   [28,29,30,23,27, 30,30,30,30,30],
+  cashP:  [8.60,8.34,10.69,17.25,22.61, 16.85,16.85,16.85,16.85,16.85],
+  arDays: [38,39,39,51,44, 45,45,45,45,45],
+  apDays: [168,190,194,267,143, 201,201,201,201,201],
+  ltd:    [212,225,191,209,492, 492,492,492,492,492],
+};
+
+let D={};
+function initD(){
+  D={};
+  cols.forEach((c,ci)=>{
+    D[c.id]={
+      rev:     getBase('rev',ci),
+      cogsP:   getBase('cogsP',ci),
+      opexP:   getBase('opexP',ci),
+      daP:     getBase('daP',ci),
+      intP:    getBase('intP',ci),
+      taxP:    getBase('taxP',ci),
+      cashP:   getBase('cashP',ci),
+      arDays:  getBase('arDays',ci),
+      apDays:  getBase('apDays',ci),
+      ltd:     getBase('ltd',ci),
+    };
+  });
+}
+
+function getBase(key,ci){
+  if(ci<BASE[key].length) return BASE[key][ci];
+  const last=BASE[key][BASE[key].length-1];
+  if(key==='rev'){
+    const growthRates={bull:[.1044,.1186,.1220,.1212],base:[.0820,.1044,.1186,.1220],bear:[.05,.07,.09,.10]};
+    const rates=growthRates[sc];
+    let v=last;
+    for(let i=BASE[key].length;i<=ci;i++) v*=(1+(rates[Math.min(i-BASE[key].length,rates.length-1)]||rates[rates.length-1]));
+    return parseFloat(v.toFixed(1));
+  }
+  return last;
+}
+
+function calc(cid){
+  const d=D[cid];
+  const r=d.rev;
+  const cogs=r*d.cogsP/100;
+  const gp=r-cogs;
+  const opex=r*d.opexP/100;
+  const ebitda=gp-opex;
+  const da=r*d.daP/100;
+  const ebit=ebitda-da;
+  const intExp=r*d.intP/100;
+  const pbt=ebit-intExp;
+  const tax=pbt*d.taxP/100;
+  const npat=pbt-tax;
+  const cash=r*d.cashP/100;
+  const ar=(r/365)*d.arDays;
+  const oca=r*0.03;
+  const tca=cash+ar+oca;
+  const ppe=12;
+  const intang=600;
+  const onca=r*0.18;
+  const tnca=ppe+intang+onca;
+  const ta=tca+tnca;
+  const ap=(cogs/365)*d.apDays;
+  const ocl=r*0.10;
+  const tcl=ap+ocl;
+  const oncl=d.ltd*0.065;
+  const tncl=d.ltd+oncl;
+  const tl=tcl+tncl;
+  const ce=135;
+  const re=npat*0.17*(cols.findIndex(c=>c.id===cid)+1);
+  const teq=ce+re;
+  const tle=tl+teq;
+  const opCF=npat+da-(ar*0.05);
+  const invCF=-(da*1.1);
+  const finCF=-(npat*0.83);
+  const netCF=opCF+invCF+finCF;
+  return {r,cogs,gp,opex,ebitda,da,ebit,intExp,pbt,tax,npat,cash,ar,oca,tca,ppe,intang,onca,tnca,ta,ap,ocl,tcl,ltd:d.ltd,oncl,tncl,tl,ce,re,teq,tle,opCF,invCF,finCF,netCF};
+}
+
+function fmt(v,dec=1){
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  const a=Math.abs(v);
+  if(v<0) return '('+a.toFixed(dec)+')';
+  return v.toFixed(dec);
+}
+function pct(v){return isNaN(v)?'—':v.toFixed(1)+'%'}
+
+function tip(label){
+  const t=TIPS[label];
+  if(!t) return `<span>${label}</span>`;
+  return `<span class="tip-wrap"><span>${label}</span><span class="tip-icon">?</span><span class="ttip">${t}</span></span>`;
+}
+
+function nc(v){return v<0?'num neg':v>0?'num pos':'num'}
+
+function buildThead(){
+  const t=document.getElementById('mainTbl');
+  const thead=t.querySelector('thead')||t.createTHead();
+  thead.innerHTML='';
+  const tr=document.createElement('tr');tr.className='yr-row';
+  const th0=document.createElement('th');th0.className='lc';
+  th0.innerHTML='<div class="th-inner">Metric</div>';tr.appendChild(th0);
+  cols.forEach(c=>{
+    const th=document.createElement('th');
+    th.innerHTML=`<div class="th-inner">
+      <input class="yr-label ${c.type}" value="${c.label}" onchange="renameCol(${c.id},this.value)" title="Click to rename">
+      <button class="del-col" onclick="delCol(${c.id})" title="Delete column">x</button>
+    </div>`;
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+}
+
+function addTR(tb,label,vals,trCls,tdCls,isInp=false,inputKey=''){
+  const tr=document.createElement('tr');if(trCls)tr.className=trCls;
+  const td0=document.createElement('td');td0.className='lc'+(trCls?' ':' ');td0.innerHTML=tip(label);
+  tr.appendChild(td0);
+  vals.forEach((v,ci)=>{
+    const td=document.createElement('td');
+    if(tdCls) td.className=tdCls;
+    if(isInp){
+      const cid=cols[ci].id;
+      const inp=document.createElement('input');
+      inp.type='number';inp.className='cell-inp';inp.step='0.1';
+      inp.value=parseFloat(v).toFixed(1);
+      inp.dataset.cid=cid;inp.dataset.key=inputKey;
+      inp.onchange=function(){
+        D[parseInt(this.dataset.cid)][this.dataset.key]=parseFloat(this.value)||0;
+        refresh();
+      };
+      td.appendChild(inp);
+    } else {
+      td.className=nc(v)+' '+(tdCls||'');
+      td.textContent=fmt(v);
+    }
+    tr.appendChild(td);
+  });
+  tb.appendChild(tr);
+}
+function addPctTR(tb,label,vals,trCls){
+  const tr=document.createElement('tr');if(trCls)tr.className=trCls;
+  const td0=document.createElement('td');td0.className='lc';td0.innerHTML=tip(label);tr.appendChild(td0);
+  vals.forEach(v=>{const td=document.createElement('td');td.className='num';td.textContent=pct(v);tr.appendChild(td);});
+  tb.appendChild(tr);
+}
+function addInpPctRow(tb,label,key){
+  const tr=document.createElement('tr');
+  const td0=document.createElement('td');td0.className='lc';td0.innerHTML=tip(label);tr.appendChild(td0);
+  cols.forEach(c=>{
+    const td=document.createElement('td');
+    const inp=document.createElement('input');
+    inp.type='number';inp.className='cell-inp pct';inp.step='0.1';inp.min='0';inp.max='100';
+    inp.value=parseFloat(D[c.id][key]).toFixed(1);
+    inp.dataset.cid=c.id;inp.dataset.key=key;
+    inp.onchange=function(){D[parseInt(this.dataset.cid)][this.dataset.key]=parseFloat(this.value)||0;refresh();};
+    td.appendChild(inp);tr.appendChild(td);
+  });
+  tb.appendChild(tr);
+}
+function addRevRow(tb){
+  const tr=document.createElement('tr');
+  const td0=document.createElement('td');td0.className='lc';td0.innerHTML=tip('Revenue');tr.appendChild(td0);
+  cols.forEach(c=>{
+    const td=document.createElement('td');
+    const inp=document.createElement('input');
+    inp.type='number';inp.className='cell-inp';inp.step='1';inp.min='0';
+    inp.value=parseFloat(D[c.id].rev).toFixed(1);
+    inp.dataset.cid=c.id;inp.dataset.key='rev';
+    inp.onchange=function(){D[parseInt(this.dataset.cid)].rev=parseFloat(this.value)||0;refresh();};
+    td.appendChild(inp);tr.appendChild(td);
+  });
+  tb.appendChild(tr);
+}
+
+function buildIS(tb,calcs){
+  const V=k=>calcs.map(c=>c[k]);
+  addRevRow(tb);
+  addInpPctRow(tb,'COGS %','cogsP');
+  addTR(tb,'Gross Profit',V('gp'),'sub');
+  addPctTR(tb,'Gross Margin',calcs.map(c=>c.gp/c.r*100));
+  const secR=document.createElement('tr');secR.className='sec';
+  const srtd=document.createElement('td');srtd.className='lc';srtd.colSpan=cols.length+1;srtd.textContent='Operating Expenses';
+  secR.appendChild(srtd);tb.appendChild(secR);
+  addInpPctRow(tb,'OPEX %','opexP');
+  addTR(tb,'EBITDA',V('ebitda'),'sub');
+  addPctTR(tb,'EBITDA Margin',calcs.map(c=>c.ebitda/c.r*100));
+  addInpPctRow(tb,'D&A %','daP');
+  addTR(tb,'EBIT',V('ebit'),'sub');
+  addPctTR(tb,'EBIT Margin',calcs.map(c=>c.ebit/c.r*100));
+  const secB=document.createElement('tr');secB.className='sec';
+  const sbtd=document.createElement('td');sbtd.className='lc';sbtd.colSpan=cols.length+1;sbtd.textContent='Below the Line';
+  secB.appendChild(sbtd);tb.appendChild(secB);
+  addInpPctRow(tb,'Interest %','intP');
+  addTR(tb,'Pre-Tax Profit',V('pbt'),'sub');
+  addInpPctRow(tb,'Tax Rate','taxP');
+  addTR(tb,'NPAT',V('npat'),'tot');
+  addPctTR(tb,'NPAT Margin',calcs.map(c=>c.npat/c.r*100));
+}
+
+function buildBS(tb,calcs){
+  const V=k=>calcs.map(c=>c[k]);
+  const s=(l)=>{const t=document.createElement('tr');t.className='sec';const d=document.createElement('td');d.className='lc';d.colSpan=cols.length+1;d.textContent=l;t.appendChild(d);tb.appendChild(t);};
+  s('Current Assets');
+  addInpPctRow(tb,'Cash','cashP');
+  const arTR=document.createElement('tr');
+  const ard0=document.createElement('td');ard0.className='lc';ard0.innerHTML=tip('Accounts Receivable');arTR.appendChild(ard0);
+  cols.forEach(c=>{const d=calc(c.id);const td=document.createElement('td');td.className='num';td.textContent=fmt(d.ar);arTR.appendChild(td);});
+  tb.appendChild(arTR);
+  addTR(tb,'Other Current Assets',V('oca'));
+  addTR(tb,'Total Current Assets',V('tca'),'sub');
+  s('Non-Current Assets');
+  addTR(tb,'PP&E (net)',V('ppe'));
+  addTR(tb,'Intangibles & Goodwill',V('intang'));
+  addTR(tb,'Other Non-Current Assets',V('onca'));
+  addTR(tb,'Total Non-Current Assets',V('tnca'),'sub');
+  addTR(tb,'Total Assets',V('ta'),'tot');
+  s('Current Liabilities');
+  const apTR=document.createElement('tr');
+  const apd0=document.createElement('td');apd0.className='lc';apd0.innerHTML=tip('Accounts Payable');apTR.appendChild(apd0);
+  cols.forEach(c=>{const d=calc(c.id);const td=document.createElement('td');td.className='num';td.textContent=fmt(d.ap);apTR.appendChild(td);});
+  tb.appendChild(apTR);
+  addTR(tb,'Other Current Liabilities',V('ocl'));
+  addTR(tb,'Total Current Liabilities',V('tcl'),'sub');
+  s('Non-Current Liabilities');
+  const ltdTR=document.createElement('tr');
+  const ltdd0=document.createElement('td');ltdd0.className='lc';ltdd0.innerHTML=tip('Long-Term Debt');ltdTR.appendChild(ltdd0);
+  cols.forEach(c=>{
+    const td=document.createElement('td');
+    const inp=document.createElement('input');inp.type='number';inp.className='cell-inp';inp.step='1';
+    inp.value=D[c.id].ltd.toFixed(1);inp.dataset.cid=c.id;inp.dataset.key='ltd';
+    inp.onchange=function(){D[parseInt(this.dataset.cid)].ltd=parseFloat(this.value)||0;refresh();};
+    td.appendChild(inp);ltdTR.appendChild(td);
+  });
+  tb.appendChild(ltdTR);
+  addTR(tb,'Other Non-Current Liabilities',V('oncl'));
+  addTR(tb,'Total Non-Current Liabilities',V('tncl'),'sub');
+  addTR(tb,'Total Liabilities',V('tl'),'tot');
+  s('Shareholders\' Equity');
+  addTR(tb,'Contributed Equity',V('ce'));
+  addTR(tb,'Retained Earnings',V('re'));
+  addTR(tb,'Total Equity',V('teq'),'sub');
+  addTR(tb,'Total Liabilities + Equity',V('tle'),'tot');
+  const check=calcs.every(c=>Math.abs(c.ta-c.tle)<10);
+  document.getElementById('bsCheck').innerHTML=check?'&#10003; Balance sheet checks':'&#10007; Balance sheet off — check inputs';
+  document.getElementById('bsCheck').className=check?'check-ok':'check-no';
+}
+
+function buildCF(tb,calcs){
+  const V=k=>calcs.map(c=>c[k]);
+  const s=(l)=>{const t=document.createElement('tr');t.className='sec';const d=document.createElement('td');d.className='lc';d.colSpan=cols.length+1;d.textContent=l;t.appendChild(d);tb.appendChild(t);};
+  s('Operating');
+  addTR(tb,'NPAT',V('npat'));
+  addTR(tb,'D&A (add back)',calcs.map(c=>c.da));
+  addTR(tb,'Working Capital Move',calcs.map((c,i)=>i===0?0:-(c.ar-calcs[i-1].ar)*0.4));
+  addTR(tb,'Operating Cash Flow',V('opCF'),'sub');
+  s('Investing');
+  addTR(tb,'Capital Expenditure',calcs.map(c=>-(c.da*1.1)));
+  addTR(tb,'Investing Cash Flow',V('invCF'),'sub');
+  s('Financing');
+  addTR(tb,'Dividends Paid',calcs.map(c=>-(c.npat*0.83)));
+  addTR(tb,'Financing Cash Flow',V('finCF'),'sub');
+  addTR(tb,'Net Change in Cash',V('netCF'),'tot');
+  addTR(tb,'Cash (opening)',calcs.map((c,i)=>i===0?27:calcs[i-1].cash));
+  addTR(tb,'Cash (closing)',V('cash'),'tot');
+}
+
+function buildRA(tb,calcs){
+  const s=(l)=>{const t=document.createElement('tr');t.className='sec';const d=document.createElement('td');d.className='lc';d.colSpan=cols.length+1;d.textContent=l;t.appendChild(d);tb.appendChild(t);};
+  const addMult=(label,vals)=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td');td0.className='lc';td0.innerHTML=tip(label);tr.appendChild(td0);
+    vals.forEach(v=>{const td=document.createElement('td');td.className='num';td.textContent=isNaN(v)?'—':v.toFixed(1)+'x';tr.appendChild(td);});
+    tb.appendChild(tr);
+  };
+  s('Profitability');
+  addPctTR(tb,'Gross Margin',calcs.map(c=>c.gp/c.r*100));
+  addPctTR(tb,'EBITDA Margin',calcs.map(c=>c.ebitda/c.r*100));
+  addPctTR(tb,'EBIT Margin',calcs.map(c=>c.ebit/c.r*100));
+  addPctTR(tb,'NPAT Margin',calcs.map(c=>c.npat/c.r*100));
+  s('Efficiency');
+  addPctTR(tb,'ROE',calcs.map(c=>c.npat/c.teq*100));
+  addPctTR(tb,'ROA',calcs.map(c=>c.npat/c.ta*100));
+  s('Leverage / Solvency');
+  addMult('Net Debt / EBITDA',calcs.map(c=>(c.ltd-c.cash)/c.ebitda));
+  addPctTR(tb,'D/E Ratio',calcs.map(c=>c.ltd/c.teq*100));
+  addMult('Current Ratio',calcs.map(c=>c.tca/c.tcl));
+  addMult('Interest Coverage',calcs.map(c=>c.ebit/c.intExp));
+}
+
+function renderKPIs(calcs){
+  const last=calcs[calcs.length-1];
+  const r=document.getElementById('kpiRow');r.innerHTML='';
+  [{l:'Revenue',v:'$'+fmt(last.r)+'M'},{l:'Gross Margin',v:pct(last.gp/last.r*100)},
+   {l:'EBITDA Margin',v:pct(last.ebitda/last.r*100)},{l:'NPAT',v:'$'+fmt(last.npat)+'M'},
+   {l:'Net Debt/EBITDA',v:((last.ltd-last.cash)/last.ebitda).toFixed(1)+'x'},{l:'NPAT Margin',v:pct(last.npat/last.r*100)}
+  ].forEach(it=>{
+    const d=document.createElement('div');d.className='kpi';
+    d.innerHTML=`<div class="kpi-lbl">${it.l}</div><div class="kpi-v">${it.v}</div>`;
+    r.appendChild(d);
+  });
+}
+
+function renderWF(calcs){
+  const c=calcs[calcs.length-1];
+  const bars=[{l:'Revenue',v:c.r,col:'#378add'},{l:'Gross Profit',v:c.gp,col:'#1d9e75'},{l:'EBITDA',v:c.ebitda,col:'#1d9e75'},{l:'EBIT',v:c.ebit,col:'#ba7517'},{l:'NPAT',v:c.npat,col:c.npat>0?'#1d9e75':'#d85a30'}];
+  const max=Math.max(...bars.map(b=>Math.abs(b.v)));
+  const w=document.getElementById('wfRow');w.innerHTML='';
+  bars.forEach(b=>{
+    const h=Math.max(3,Math.round(Math.abs(b.v)/max*70));
+    const d=document.createElement('div');d.className='wf-b';
+    d.innerHTML=`<span class="wf-v">${fmt(b.v)}</span><div class="wf-bar" style="height:${h}px;background:${b.col}"></div><span class="wf-lbl">${b.l}</span>`;
+    w.appendChild(d);
+  });
+}
+
+function refresh(){
+  const calcs=cols.map(c=>calc(c.id));
+  buildThead();
+  const t=document.getElementById('mainTbl');
+  const tb=t.querySelector('tbody')||t.createTBody();
+  tb.innerHTML='';
+  if(tab==='IS') buildIS(tb,calcs);
+  else if(tab==='BS') buildBS(tb,calcs);
+  else if(tab==='CF') buildCF(tb,calcs);
+  else buildRA(tb,calcs);
+  if(tab!=='BS') document.getElementById('bsCheck').innerHTML='';
+  renderKPIs(calcs);
+  renderWF(calcs);
+}
+
+function showTab(t){
+  tab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.className='tab'+(['IS','BS','CF','RA'][i]===t?' on':'');
+  });
+  refresh();
+}
+
+function setSc(s){
+  sc=s;
+  ['Bull','Base','Bear'].forEach(x=>{
+    const b=document.getElementById('btn'+x);
+    const low=x.toLowerCase();
+    b.className='btn'+(low===s?' sc-'+low:'');
+  });
+  cols.forEach((c,ci)=>{
+    if(c.type==='fore'&&ci>=5){
+      D[c.id].rev=getBase('rev',ci);
+    }
+  });
+  refresh();
+}
+
+function addColumn(){
+  const label=document.getElementById('newYrLabel').value.trim()||'FY??';
+  const type=document.getElementById('newYrType').value;
+  const id=nextId++;
+  cols.push({id,label,type});
+  const lastId=cols[cols.length-2]?.id;
+  const lastD=lastId!=null?D[lastId]:{};
+  D[id]={
+    rev: lastD.rev ? parseFloat((lastD.rev*1.10).toFixed(1)) : 100,
+    cogsP: lastD.cogsP||8.75,
+    opexP: lastD.opexP||50,
+    daP:   lastD.daP||4,
+    intP:  lastD.intP||3,
+    taxP:  lastD.taxP||30,
+    cashP: lastD.cashP||16,
+    arDays:lastD.arDays||45,
+    apDays:lastD.apDays||200,
+    ltd:   lastD.ltd||492,
+  };
+  document.getElementById('newYrLabel').value='FY'+(parseInt(label.replace(/\D/g,''))+1||25)+'E';
+  refresh();
+}
+
+function delCol(id){
+  if(cols.length<=1){alert('Must keep at least one column.');return;}
+  cols=cols.filter(c=>c.id!==id);
+  delete D[id];
+  refresh();
+}
+
+function renameCol(id,val){
+  const c=cols.find(x=>x.id===id);
+  if(c) c.label=val||'FY??';
+}
+
+function exportCSV(){
+  const calcs=cols.map(c=>calc(c.id));
+  const hdr='Metric,'+cols.map(c=>c.label).join(',')+'\n';
+  const rows=[
+    ['Revenue',...calcs.map(c=>c.r.toFixed(1))],
+    ['Gross Profit',...calcs.map(c=>c.gp.toFixed(1))],
+    ['EBITDA',...calcs.map(c=>c.ebitda.toFixed(1))],
+    ['EBIT',...calcs.map(c=>c.ebit.toFixed(1))],
+    ['NPAT',...calcs.map(c=>c.npat.toFixed(1))],
+    ['Total Assets',...calcs.map(c=>c.ta.toFixed(1))],
+    ['Total Liabilities',...calcs.map(c=>c.tl.toFixed(1))],
+    ['Total Equity',...calcs.map(c=>c.teq.toFixed(1))],
+    ['Op Cash Flow',...calcs.map(c=>c.opCF.toFixed(1))],
+    ['Net Change in Cash',...calcs.map(c=>c.netCF.toFixed(1))],
+  ];
+  const csv=hdr+rows.map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='financial_model.csv';a.click();
+}
+
+initD();
+refresh();
+</script>
